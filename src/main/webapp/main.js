@@ -1,14 +1,18 @@
 var ws, videoNode;
+var available = true;
 
 function init() {
     videoNode = document.getElementById('video');
     videoNode.addEventListener('pause', onPause, false);
     videoNode.addEventListener('play', onPlay, false);
 
+    videoNode.onpause = function (ev) { console.log("onpause") };
+
     var inputNode = document.getElementById('fileInput');
     inputNode.addEventListener('change', playSelectedFile, false);
 
-    var service = "wss://" + document.location.host + document.location.pathname + "/api";
+    var protocol = document.location.protocol === 'http:' ? 'ws' : 'wss';
+    var service = protocol + "://" + document.location.host + document.location.pathname + "/api";
     ws = new WebSocket(service);
     ws.onmessage = onMessage;
 }
@@ -17,30 +21,35 @@ function onMessage(event) {
     var json = JSON.parse(event.data);
     switch (json.type) {
         case 'PLAY': {
-            videoNode.currentTime = json.timestamp;
-            videoNode.play();
+            if (available) {
+                available = false;
+                videoNode.currentTime = json.timestamp;
+                console.log("before play");
+                videoNode.play().finally(function () {
+                    console.log("after play");
+                    available = true;
+                });
+            }
             break;
         }
         case 'PAUSE': {
-            videoNode.pause();
-            break;
-        }
-        case 'REWIND': {
-            videoNode.currentTime = json.timestamp;
+            if (available) {
+                available = false;
+                console.log("before pause");
+                videoNode.pause();
+                setTimeout(function () {
+                    console.log("after  pause");
+                    available = true;
+                }, 50)
+            }
             break;
         }
     }
 }
 
-function onRewind(event) {
-    var json = JSON.stringify({
-        "type": "REWIND",
-        "timestamp": event.target.currentTime
-    });
-    ws.send(json)
-}
-
 function onPlay(event) {
+    console.log("onPlay");
+    if (!available) return;
     var json = JSON.stringify({
         "type": "PLAY",
         "timestamp": event.target.currentTime
@@ -49,6 +58,8 @@ function onPlay(event) {
 }
 
 function onPause(event) {
+    console.log("onPause");
+    if (!available) return;
     var json = JSON.stringify({
         "type": "PAUSE"
     });
@@ -58,15 +69,6 @@ function onPause(event) {
 function playSelectedFile(event) {
     var file = this.files[0];
     videoNode.src = window.URL.createObjectURL(file);
-}
-
-function send() {
-    var json = JSON.stringify({
-        "type": "REWIND",
-        "timestamp": 1
-    });
-
-    ws.send(json);
 }
 
 init();

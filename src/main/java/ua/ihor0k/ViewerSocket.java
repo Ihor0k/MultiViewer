@@ -1,7 +1,5 @@
 package ua.ihor0k;
 
-import com.google.gson.Gson;
-
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
@@ -20,20 +18,20 @@ public class ViewerSocket {
 
     @OnOpen
     public void onOpen(Session session) {
-        System.out.println("open");
+        System.out.println("open: " + session.getId());
         this.session = session;
         endpoints.add(this);
     }
 
     @OnMessage
     public void onMessage(Session session, Message message) {
-        System.out.println(message.toString());
-        broadcast(message);
+        System.out.println(message.toString() + ": " + session.getId());
+        broadcast(message, this);
     }
 
     @OnClose
     public void onClose(Session session) {
-        System.out.println("close");
+        System.out.println("close: " + session.getId());
         endpoints.remove(this);
     }
 
@@ -42,11 +40,13 @@ public class ViewerSocket {
         error.printStackTrace();
     }
 
-    private static void broadcast(Message message) {
+    private static void broadcast(Message message, ViewerSocket caller) {
         for (ViewerSocket endpoint : endpoints) {
             synchronized (endpoint) {
                 try {
-                    endpoint.session.getBasicRemote().sendObject(message);
+                    if (endpoint != caller) {
+                        endpoint.session.getBasicRemote().sendObject(message);
+                    }
                 } catch (IOException | EncodeException e) {
                     e.printStackTrace();
                 }
