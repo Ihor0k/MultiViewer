@@ -6,8 +6,6 @@ function init() {
     videoNode.addEventListener('pause', onPause, false);
     videoNode.addEventListener('play', onPlay, false);
 
-    videoNode.onpause = function (ev) { console.log("onpause") };
-
     var inputNode = document.getElementById('fileInput');
     inputNode.addEventListener('change', playSelectedFile, false);
 
@@ -24,9 +22,7 @@ function onMessage(event) {
             if (available) {
                 available = false;
                 videoNode.currentTime = json.timestamp;
-                console.log("before play");
                 videoNode.play().finally(function () {
-                    console.log("after play");
                     available = true;
                 });
             }
@@ -35,10 +31,8 @@ function onMessage(event) {
         case 'PAUSE': {
             if (available) {
                 available = false;
-                console.log("before pause");
                 videoNode.pause();
                 setTimeout(function () {
-                    console.log("after  pause");
                     available = true;
                 }, 50)
             }
@@ -48,7 +42,6 @@ function onMessage(event) {
 }
 
 function onPlay(event) {
-    console.log("onPlay");
     if (!available) return;
     var json = JSON.stringify({
         "type": "PLAY",
@@ -58,7 +51,6 @@ function onPlay(event) {
 }
 
 function onPause(event) {
-    console.log("onPause");
     if (!available) return;
     var json = JSON.stringify({
         "type": "PAUSE"
