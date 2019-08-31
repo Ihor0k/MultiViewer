@@ -8,7 +8,7 @@ function init() {
     var inputNode = document.getElementById('fileInput');
     inputNode.addEventListener('change', playSelectedFile, false);
 
-    var service = "ws://" + document.location.host + document.location.pathname + "/api";
+    var service = "wss://" + document.location.host + document.location.pathname + "/api";
     ws = new WebSocket(service);
     ws.onmessage = onMessage;
 }
