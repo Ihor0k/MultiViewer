@@ -1,5 +1,7 @@
 package ua.ihor0k;
 
+import com.google.gson.Gson;
+
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
@@ -11,8 +13,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
         encoders = MessageEncoder.class,
         decoders = MessageDecoder.class
 )
-public class ViewerEndpoint {
-    private static Set<ViewerEndpoint> endpoints = new CopyOnWriteArraySet<>();
+public class ViewerSocket {
+    private static Set<ViewerSocket> endpoints = new CopyOnWriteArraySet<>();
 
     private Session session;
 
@@ -25,7 +27,7 @@ public class ViewerEndpoint {
 
     @OnMessage
     public void onMessage(Session session, Message message) {
-        System.out.println("message");
+        System.out.println(message.toString());
         broadcast(message);
     }
 
@@ -41,7 +43,7 @@ public class ViewerEndpoint {
     }
 
     private static void broadcast(Message message) {
-        for (ViewerEndpoint endpoint : endpoints) {
+        for (ViewerSocket endpoint : endpoints) {
             synchronized (endpoint) {
                 try {
                     endpoint.session.getBasicRemote().sendObject(message);
