@@ -8,8 +8,7 @@ function init() {
     var inputNode = document.getElementById('fileInput');
     inputNode.addEventListener('change', playSelectedFile, false);
 
-    var service = "ws://multi-viewer.herokuapp.com/api";
-    service = "ws://localhost:8080/MultiViewer_war/api";
+    var service = "ws://" + document.location.host + document.location.pathname + "/api";
     ws = new WebSocket(service);
     ws.onmessage = onMessage;
 }
