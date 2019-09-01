@@ -21,6 +21,7 @@ public class ViewerSocket {
         System.out.println("open: " + session.getId());
         this.session = session;
         endpoints.add(this);
+        broadcast(new Message(MessageType.LOG, null, "OPEN: " + session.getId()), null);
     }
 
     @OnMessage
@@ -33,6 +34,7 @@ public class ViewerSocket {
     public void onClose(Session session) {
         System.out.println("close: " + session.getId());
         endpoints.remove(this);
+        broadcast(new Message(MessageType.LOG, null, "CLOSE: " + session.getId()), null);
     }
 
     @OnError

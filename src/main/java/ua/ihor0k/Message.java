@@ -8,4 +8,5 @@ import lombok.Data;
 public class Message {
     private MessageType type;
     private Double timestamp;
+    private String message;
 }
