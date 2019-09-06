@@ -5,7 +5,10 @@ function init() {
     videoNode = document.getElementById('video');
     videoNode.addEventListener('pause', onPause, false);
     videoNode.addEventListener('play', onPlay, false);
-    videoNode.onerror = log;
+    videoNode.onerror = function (event) {
+        console.log(event);
+        log("videoNode error. See console for details")
+    };
 
     var inputNode = document.getElementById('fileInput');
     inputNode.addEventListener('change', playSelectedFile, false);
@@ -72,7 +75,10 @@ function initSocket() {
     var protocol = document.location.protocol === 'http:' ? 'ws' : 'wss';
     var service = protocol + "://" + document.location.host + document.location.pathname + "/api";
     ws = new WebSocket(service);
-    ws.onerror = log;
+    ws.onerror = function (event) {
+        console.log(event);
+        log("socket error. See console for details")
+    };
     ws.onmessage = onMessage;
 }
 
