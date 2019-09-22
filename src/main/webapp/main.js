@@ -75,6 +75,9 @@ function initSocket() {
     var protocol = document.location.protocol === 'http:' ? 'ws' : 'wss';
     var service = protocol + "://" + document.location.host + document.location.pathname + "/api";
     ws = new WebSocket(service);
+    ws.onclose = function (ev) {
+        setTimeout(initSocket, 500)
+    };
     ws.onerror = function (event) {
         console.log(event);
         log("socket error. See console for details")
